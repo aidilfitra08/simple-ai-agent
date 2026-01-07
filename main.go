@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net/http"
 
 	"github.com/aidilfitra08/simple-ai-agent/config"
 	"github.com/aidilfitra08/simple-ai-agent/database"
@@ -11,11 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Handler is exported for Vercel Serverless Functions runtime.
-var Handler http.Handler
-
-// buildHandler constructs the HTTP handler (Gin engine) with all dependencies.
-func buildHandler() (http.Handler, error) {
+func main() {
 	// Load configuration
 	cfg := config.Load()
 	log.Printf("Using LLM Provider: %s", cfg.LLMProvider)
@@ -33,12 +28,12 @@ func buildHandler() (http.Handler, error) {
 	// Connect to database
 	db, err := database.Connect(cfg)
 	if err != nil {
-		return nil, err
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
 	// Run migrations
 	if err := database.Migrate(db); err != nil {
-		return nil, err
+		log.Fatalf("Failed to migrate database: %v", err)
 	}
 
 	// Initialize services
@@ -63,30 +58,9 @@ func buildHandler() (http.Handler, error) {
 	r.POST("/chat/stream", chatHandler.HandleChatStream)
 	r.GET("/models/gemini", modelsHandler.ListGeminiModels)
 
-	return r, nil
-}
-
-func init() {
-	h, err := buildHandler()
-	if err != nil {
-		log.Printf("Failed to initialize handler: %v", err)
-		Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			http.Error(w, "Service unavailable", http.StatusServiceUnavailable)
-		})
-		return
-	}
-	Handler = h
-}
-
-func main() {
-	// Local/dev server run path
-	cfg := config.Load()
-	h, err := buildHandler()
-	if err != nil {
-		log.Fatalf("Startup failure: %v", err)
-	}
+	// Start server
 	log.Printf("Server starting on port %s", cfg.AppPort)
-	if err := http.ListenAndServe(":"+cfg.AppPort, h); err != nil {
+	if err := r.Run(":" + cfg.AppPort); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
