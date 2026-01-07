@@ -8,7 +8,7 @@
   },
   "env": {
     "APP_ENV": "production",
-    "DB_PROVIDER": "@db_provider",
+    "DB_PROVIDER": "${DB_PROVIDER}",
     "LLM_PROVIDER": "@llm_provider",
     "GEMINI_API_KEY": "@gemini_api_key",
     "GEMINI_MODEL": "@gemini_model",
@@ -19,7 +19,7 @@
     "DB_PASSWORD": "@db_password",
     "DB_NAME": "@db_name",
     "DB_PORT": "@db_port",
-    "SUPABASE_DB_URL": "@supabase_db_url",
+    "SUPABASE_DB_URL": "${SUPABASE_DB_URL}",
     "APP_PORT": "8080",
     "TRUSTED_PROXIES": "google.com"
   }
