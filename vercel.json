@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "main.go",
+      "use": "@vercel/go"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/main.go"
+    }
+  ],
+  "functions": {
+    "main.go": {
+      "maxDuration": 60
+    }
+  },
+  "env": {
+    "APP_ENV": "production",
+    "DB_PROVIDER": "@db_provider",
+    "LLM_PROVIDER": "@llm_provider",
+    "GEMINI_API_KEY": "@gemini_api_key",
+    "GEMINI_MODEL": "@gemini_model",
+    "OLLAMA_URL": "@ollama_url",
+    "OLLAMA_MODEL": "@ollama_model",
+    "DB_HOST": "@db_host",
+    "DB_USER": "@db_user",
+    "DB_PASSWORD": "@db_password",
+    "DB_NAME": "@db_name",
+    "DB_PORT": "@db_port",
+    "SUPABASE_DB_URL": "@supabase_db_url",
+    "APP_PORT": "8080",
+    "TRUSTED_PROXIES": "google.com"
+  }
+}
