@@ -1,8 +1,9 @@
-package handler
+package main
 
 import (
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/aidilfitra08/simple-ai-agent/config"
 	"github.com/aidilfitra08/simple-ai-agent/database"
@@ -11,14 +12,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var router http.Handler
+var (
+	router http.Handler
+	once   sync.Once
+)
 
-func init() {
-	// Load configuration
+func initRouter() {
 	cfg := config.Load()
 	log.Printf("Using LLM Provider: %s", cfg.LLMProvider)
 
-	// Configure Gin mode based on environment
+	// Gin mode
 	switch cfg.AppEnv {
 	case "production":
 		gin.SetMode(gin.ReleaseMode)
@@ -28,43 +31,30 @@ func init() {
 		gin.SetMode(gin.DebugMode)
 	}
 
-	// Connect to database
 	db, err := database.Connect(cfg)
 	if err != nil {
-		log.Printf("Failed to connect to database: %v", err)
-		router = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			http.Error(w, "Service unavailable", http.StatusServiceUnavailable)
-		})
+		log.Printf("DB connection failed: %v", err)
+		router = serviceUnavailable()
 		return
 	}
 
-	// Run migrations
-	if err := database.Migrate(db); err != nil {
-		log.Printf("Failed to migrate database: %v", err)
-		router = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			http.Error(w, "Service unavailable", http.StatusServiceUnavailable)
-		})
-		return
-	}
+	// ❌ Do NOT auto-migrate on Vercel
+	// Run migrations separately (CI / manual)
 
-	// Initialize services
 	llmService := services.NewLLMService(cfg)
 
-	// Initialize handlers
 	chatHandler := handlers.NewChatHandler(db, llmService)
 	modelsHandler := handlers.NewModelsHandler(cfg)
 
-	// Setup router
-	r := gin.Default()
+	r := gin.New()
+	r.Use(gin.Recovery())
 
-	// Configure trusted proxies
 	if cfg.AppEnv == "production" {
-		r.SetTrustedProxies([]string{"google.com"})
+		_ = r.SetTrustedProxies([]string{"google.com"})
 	} else if len(cfg.TrustedProxies) > 0 {
-		r.SetTrustedProxies(cfg.TrustedProxies)
+		_ = r.SetTrustedProxies(cfg.TrustedProxies)
 	}
 
-	// Register routes
 	r.POST("/chat", chatHandler.HandleChat)
 	r.POST("/chat/stream", chatHandler.HandleChatStream)
 	r.GET("/models/gemini", modelsHandler.ListGeminiModels)
@@ -72,7 +62,14 @@ func init() {
 	router = r
 }
 
-// Handler is the Vercel serverless function entrypoint
+func serviceUnavailable() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		http.Error(w, "Service unavailable", http.StatusServiceUnavailable)
+	})
+}
+
+// Handler is the Vercel Function entrypoint
 func Handler(w http.ResponseWriter, r *http.Request) {
+	once.Do(initRouter)
 	router.ServeHTTP(w, r)
 }
