@@ -2,7 +2,6 @@
   "version": 2,
   "functions": {
     "main.go": {
-      "runtime": "go1.x",
       "maxDuration": 60
     }
   },
