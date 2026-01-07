@@ -9,18 +9,18 @@
   "env": {
     "APP_ENV": "production",
     "DB_PROVIDER": "${DB_PROVIDER}",
-    "LLM_PROVIDER": "@llm_provider",
-    "GEMINI_API_KEY": "@gemini_api_key",
-    "GEMINI_MODEL": "@gemini_model",
-    "OLLAMA_URL": "@ollama_url",
-    "OLLAMA_MODEL": "@ollama_model",
-    "DB_HOST": "@db_host",
-    "DB_USER": "@db_user",
-    "DB_PASSWORD": "@db_password",
-    "DB_NAME": "@db_name",
-    "DB_PORT": "@db_port",
+    "LLM_PROVIDER": "${LLM_PROVIDER}",
+    "GEMINI_API_KEY": "${GEMINI_API_KEY}",
+    "GEMINI_MODEL": "${GEMINI_MODEL}",
+    "OLLAMA_URL": "${OLLAMA_URL}",
+    "OLLAMA_MODEL": "${OLLAMA_MODEL}",
+    "DB_HOST": "${DB_HOST}",
+    "DB_USER": "${DB_USER}",
+    "DB_PASSWORD": "${DB_PASSWORD}",
+    "DB_NAME": "${DB_NAME}",
+    "DB_PORT": "${DB_PORT}",
     "SUPABASE_DB_URL": "${SUPABASE_DB_URL}",
     "APP_PORT": "8080",
-    "TRUSTED_PROXIES": "google.com"
+    "TRUSTED_PROXIES": "${TRUSTED_PROXIES}"
   }
 }
