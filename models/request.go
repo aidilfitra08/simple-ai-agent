@@ -2,7 +2,7 @@ package models
 
 // ChatRequest represents a chat request from the frontend
 type ChatRequest struct {
-	UserID uint   `json:"user_id"`
+	// UserID uint   `json:"user_id"`
 	Prompt string `json:"prompt"`
 }
 

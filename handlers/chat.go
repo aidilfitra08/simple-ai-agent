@@ -35,11 +35,11 @@ func (h *ChatHandler) HandleChat(c *gin.Context) {
 	}
 
 	// Fetch user data
-	var user models.User
-	if err := h.db.First(&user, req.UserID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-		return
-	}
+	// var user models.User
+	// if err := h.db.First(&user, req.UserID).Error; err != nil {
+	// 	c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+	// 	return
+	// }
 
 	// Create system prompt
 	systemPrompt := fmt.Sprintf(`
@@ -75,11 +75,11 @@ func (h *ChatHandler) HandleChatStream(c *gin.Context) {
 	}
 
 	// Fetch user data
-	var user models.User
-	if err := h.db.First(&user, req.UserID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-		return
-	}
+	// var user models.User
+	// if err := h.db.First(&user, req.UserID).Error; err != nil {
+	// 	c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+	// 	return
+	// }
 
 	// Create system prompt
 	systemPrompt := fmt.Sprintf(`
